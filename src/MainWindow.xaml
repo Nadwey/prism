@@ -1,0 +1,39 @@
+﻿<Window x:Class="prism.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:prism"
+        mc:Ignorable="d"
+        Title="prism:loader" Height="128" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded"  WindowStartupLocation="CenterScreen" WindowStyle="None" Background="Transparent" AllowsTransparency="True" Icon="/logo.png">
+    <Grid>
+        <Rectangle x:Name="handler" Fill="#FF0C0C0C" RadiusX="15" RadiusY="15"/>
+        <Grid>
+            <StackPanel x:Name="handler_panel" Orientation="Horizontal">
+                <Grid>
+                    <Rectangle Fill="#FF0C0C0C" Height="100" Width="100" HorizontalAlignment="Left" Margin="25,0,0,0" RadiusY="10" RadiusX="10" x:Name="handler_logo_handler" Stroke="#FF1E1D1F">
+                        <Rectangle.Effect>
+                            <DropShadowEffect BlurRadius="20" Direction="0" ShadowDepth="0" Opacity="0.8"/>
+                        </Rectangle.Effect>
+                    </Rectangle>
+                    <Image Height="60" Width="60" HorizontalAlignment="Left" Margin="45,0,0,0" x:Name="handler_logo_image" Source="./logo.png"/>
+                </Grid>
+
+                <StackPanel x:Name="loadingbar" VerticalAlignment="Center" Margin="30,0,0,0">
+                    <Label Padding="0,0,0,0" Margin="0,0,0,5" x:Name="loadingbar_text" FontSize="14" FontFamily="Fonts/#Inter Bold" Content="Doing nothing..." Foreground="White"/>
+                    <Grid x:Name="loadingbar_bar">
+                        <Rectangle x:Name="loadingbar_bar_background" Height="15" Width="600" RadiusX="5" RadiusY="5" Fill="#FF0C0C0C" Stroke="#FF1B1A1A" HorizontalAlignment="Left"/>
+                        <Rectangle x:Name="loadingbar_bar_loader" Height="15" Width="20" RadiusX="5" RadiusY="5" Stroke="#FF1B1A1A" HorizontalAlignment="Left">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0,1">
+                                    <GradientStop Color="#FF7F1AC7"/>
+                                    <GradientStop Color="#FF3701FE" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
