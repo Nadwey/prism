@@ -1,6 +1,7 @@
 ﻿using prism.Fonts;
 using System;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -44,7 +45,7 @@ namespace prism
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await ChangeProgress(80, 400, "Searching for Minecraft window...");
+            await ChangeProgress(80, 200, "Searching for Minecraft window...");
 
             DispatcherTimer CaptureWindowTimer = new DispatcherTimer();
             CaptureWindowTimer.Interval = TimeSpan.FromMilliseconds(1);
@@ -68,8 +69,40 @@ namespace prism
             }
             CaptureWindowTimer.Start();
             await Task.Delay(200);
-            await ChangeProgress(400, 600, $"Captured Client Information! [X: {LocalMemory.ClientX}, Y: {LocalMemory.ClientY}] - [H: {LocalMemory.ClientHeight}, W: {LocalMemory.ClientWidth}]");
-            await ChangeProgress(450, 400, $"Checking for latest vs current version");
+            await ChangeProgress(400, 300, $"Captured Client Information! [X: {LocalMemory.ClientX}, Y: {LocalMemory.ClientY}] - [H: {LocalMemory.ClientHeight}, W: {LocalMemory.ClientWidth}]");
+            await ChangeProgress(450, 200, $"Checking for latest vs current version");
+
+            bool VersionCheckResult = false;
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    string RemoteContent = await client.GetStringAsync(Config.VersionServer);
+                    double ServerVersion = double.Parse(RemoteContent);
+
+                    if (ServerVersion > Config.Version)
+                    {
+                        MessageBox.Show("A newer version of prism is avalible. Please upgrade!");
+                    }
+                    else if (ServerVersion == Config.Version) { VersionCheckResult = true; }
+                    else
+                    {
+                        MessageBox.Show("How the fuck? Your version is newer than the one on server... Nice experiments!");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unexpected error: {ex}");
+                }
+            }
+
+            if (VersionCheckResult == true)
+            {
+                await ChangeProgress(600, 300, $"Version checking result: Passed.");
+            }
+
+            // Launch che@t window [TODO]
+            this.Hide();
         }
 
         private async void CaptureWindow_Tick(object sender, EventArgs e)

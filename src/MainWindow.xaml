@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prism"
         mc:Ignorable="d"
-        Title="prism:loader" Height="128" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded"  WindowStartupLocation="CenterScreen" WindowStyle="None" Background="Transparent" AllowsTransparency="True" Icon="/logo.png">
+        Title="prism:loader" Height="128" Topmost="True" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded"  WindowStartupLocation="CenterScreen" WindowStyle="None" Background="Transparent" AllowsTransparency="True" Icon="/logo.png">
     <Grid>
         <Rectangle x:Name="handler" Fill="#FF0C0C0C" RadiusX="15" RadiusY="15"/>
         <Grid>
