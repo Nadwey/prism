@@ -1,6 +1,7 @@
 ﻿using prism.Fonts;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -115,7 +116,7 @@ namespace prism
                 try
                 {
                     string RemoteContent = await client.GetStringAsync(Config.VersionServer);
-                    double ServerVersion = double.Parse(RemoteContent);
+                    double ServerVersion = double.Parse(RemoteContent, CultureInfo.InvariantCulture);
 
                     if (ServerVersion > Config.Version)
                     {
