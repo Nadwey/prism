@@ -5,6 +5,8 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -14,6 +16,8 @@ namespace prism
 
     public partial class MainWindow : Window
     {
+        Windows.MessageBox LocalMessageBox = new Windows.MessageBox();
+        AppWindow appwindow_frame = new AppWindow();
         public MainWindow()
         {
             InitializeComponent();
@@ -26,6 +30,16 @@ namespace prism
         // maybe l8r
         [DllImport("user32.dll")]
         static extern int SetWindowText(IntPtr hWnd, string text);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int processId);
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
@@ -45,12 +59,13 @@ namespace prism
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await ChangeProgress(80, 200, "Searching for Minecraft window...");
+            await ChangeProgress(80, 200, "Searching for Minecraft...");
 
             DispatcherTimer CaptureWindowTimer = new DispatcherTimer();
             CaptureWindowTimer.Interval = TimeSpan.FromMilliseconds(1);
             CaptureWindowTimer.Tick += CaptureWindow_Tick;
 
+            int FoundClients = 0;
             foreach (Process process in Process.GetProcesses())
             {
                 if (!string.IsNullOrEmpty(process.MainWindowTitle))
@@ -59,17 +74,39 @@ namespace prism
                     {
                         if (process.MainWindowTitle.StartsWith(allowedClient))
                         {
-                            await ChangeProgress(200, 600, $"Found Minecraft window! [{process.MainWindowTitle}]");
-                            LocalMemory.GameClient = process;
+                            if (process.ProcessName.ToString().Contains("java"))
+                            {
+                                FoundClients++;
 
-                            break; // Exit the loop, window found :cool:
+                                await ChangeProgress(200, 600, $"Found Minecraft! [{process.MainWindowTitle}]");
+                                LocalMemory.GameClient = process;
+
+                                break; // Exit the loop, window found :cool:
+                            }
                         }
                     }
                 }
             }
+
+            if (FoundClients == 0)
+            {
+                LocalMessageBox.ShowMessage("Minecraft client not found. Client not supported or isnt running.");
+                System.Environment.Exit(0);
+            }
+
+            if (FoundClients > 1)
+            {
+                LocalMessageBox.ShowMessage("Too many minecraft clients are running at same time. Please use only one at the time.");
+                this.Close();
+            }
+
             CaptureWindowTimer.Start();
             await Task.Delay(200);
-            await ChangeProgress(400, 300, $"Captured Client Information! [X: {LocalMemory.ClientX}, Y: {LocalMemory.ClientY}] - [H: {LocalMemory.ClientHeight}, W: {LocalMemory.ClientWidth}]");
+
+            // Discord RPC
+            await ChangeProgress(250, 200, "Setting up discord RPC.");
+
+
             await ChangeProgress(450, 200, $"Checking for latest vs current version");
 
             bool VersionCheckResult = false;
@@ -82,45 +119,120 @@ namespace prism
 
                     if (ServerVersion > Config.Version)
                     {
-                        MessageBox.Show("A newer version of prism is avalible. Please upgrade!");
+                        LocalMessageBox.ShowMessage("A never version of prism is avalible. Please update!");
+                        System.Environment.Exit(0);
                     }
                     else if (ServerVersion == Config.Version) { VersionCheckResult = true; }
                     else
                     {
-                        MessageBox.Show("How the fuck? Your version is newer than the one on server... Nice experiments!");
+                        LocalMessageBox.ShowMessage("How the fuck? Your version is newer than the one on server... Nice experiments, or just a server error lol");
+                        System.Environment.Exit(0);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Unexpected error: {ex}");
+                    LocalMessageBox.ShowMessage($"Unexpected error while communicating with version server: {ex}");
+                    this.Close();
                 }
             }
 
             if (VersionCheckResult == true)
-            {
                 await ChangeProgress(600, 300, $"Version checking result: Passed.");
-            }
+            LocalMemory.GameClient_DefaultTitle = LocalMemory.GameClient.MainWindowTitle;
 
-            // Launch che@t window [TODO]
+            ConfigManager.EnsureConfigFileExists();
+
+            if (ConfigManager.GetKey("agreement") == "false")
+                appwindow_frame.handlerframe.Navigate(new Windows.UserAgreement.Intro());
+
             this.Hide();
+            appwindow_frame.Show();
+
+            // Focus the LocalMemory.GameClient
+            if (LocalMemory.GameClient == null) throw new ArgumentNullException(nameof(LocalMemory.GameClient));
+            IntPtr handle = LocalMemory.GameClient.MainWindowHandle;
+            if (handle != IntPtr.Zero)
+                SetForegroundWindow(handle);
         }
 
+        bool GameClientActive = true;
+        bool GameCleintActiveMirror = true;
         private async void CaptureWindow_Tick(object sender, EventArgs e)
         {
-            RECT clientRect;
-            if (GetClientRect(LocalMemory.GameClient.MainWindowHandle, out clientRect))
+            GameCleintActiveMirror = GameClientActive;
+            if (IsProcessWindowFocused(LocalMemory.GameClient))
             {
-                POINT screenPoint = new POINT { X = clientRect.Left, Y = clientRect.Top };
-                ClientToScreen(LocalMemory.GameClient.MainWindowHandle, ref screenPoint);
+                RECT clientRect;
+                if (GetClientRect(LocalMemory.GameClient.MainWindowHandle, out clientRect))
+                {
+                    POINT screenPoint = new POINT { X = clientRect.Left, Y = clientRect.Top };
+                    ClientToScreen(LocalMemory.GameClient.MainWindowHandle, ref screenPoint);
 
-                LocalMemory.ClientWidth = clientRect.Right - clientRect.Left;
-                LocalMemory.ClientHeight = clientRect.Bottom - clientRect.Top;
-                LocalMemory.ClientX = screenPoint.X; LocalMemory.ClientY = screenPoint.Y;
+                    //LocalMemory.ClientWidth = clientRect.Right - clientRect.Left;
+                    //LocalMemory.ClientHeight = clientRect.Bottom - clientRect.Top;
+                    //LocalMemory.ClientX = screenPoint.X; LocalMemory.ClientY = screenPoint.Y;
+
+                    appwindow_frame.Top = screenPoint.Y;
+                    appwindow_frame.Left = screenPoint.X;
+                    appwindow_frame.Height = clientRect.Bottom - clientRect.Top;
+                    appwindow_frame.Width = clientRect.Right - clientRect.Left;
+
+                    if (GameClientActive != true)
+                        GameClientActive = true;
+                }
+                else
+                {
+                    LocalMessageBox.ShowMessage("Failed to get client information. Closing prism as soon as possible.");
+                    System.Environment.Exit(0);
+                }
+            } else 
+            { 
+                if (GameClientActive != false)
+                    GameClientActive = false;
             }
-            else
+
+            if (GameCleintActiveMirror != GameClientActive)
+                if (GameClientActive == true)
+                {
+                    appwindow_frame.Show();
+                } else
+                {
+                    appwindow_frame.Hide();
+                }
+        }
+
+        private static bool IsProcessWindowFocused(Process process)
+        {
+            if (process == null)
+                return false;
+
+            IntPtr handle = process.MainWindowHandle;
+            if (handle != IntPtr.Zero)
             {
-                await ChangeProgress(0, 0, "Failed to get client information. Close this program asap.");
+                IntPtr foregroundWindow = GetForegroundWindow();
+                int currentProcessId;
+                GetWindowThreadProcessId(foregroundWindow, out currentProcessId);
+
+                return currentProcessId == process.Id;
             }
+
+            return false;
+        }
+
+        public static bool IsProcessWindowVisible(Process process)
+        {
+            if (process == null)
+            {
+                throw new ArgumentNullException(nameof(process));
+            }
+
+            IntPtr handle = process.MainWindowHandle;
+            if (handle != IntPtr.Zero)
+            {
+                return IsWindowVisible(handle);
+            }
+
+            return false;
         }
 
         private async Task ChangeProgress(double targetWidth, int animationLength, string progressText)

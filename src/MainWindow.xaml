@@ -5,18 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prism"
         mc:Ignorable="d"
-        Title="prism:loader" Height="128" Topmost="True" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded"  WindowStartupLocation="CenterScreen" WindowStyle="None" Background="Transparent" AllowsTransparency="True" Icon="/logo.png">
+        Title="prism:loader" Height="128" Width="800" ResizeMode="NoResize" Loaded="Window_Loaded"  WindowStartupLocation="CenterScreen" WindowStyle="None" Background="Transparent" AllowsTransparency="True" Icon="/logo.ico">
     <Grid>
-        <Rectangle x:Name="handler" Fill="#FF0C0C0C" RadiusX="15" RadiusY="15"/>
+        <Rectangle x:Name="handler" Fill="#FF0C0C0C" RadiusX="15" RadiusY="15" Width="800" Height="128"/>
         <Grid>
             <StackPanel x:Name="handler_panel" Orientation="Horizontal">
                 <Grid>
                     <Rectangle Fill="#FF0C0C0C" Height="100" Width="100" HorizontalAlignment="Left" Margin="25,0,0,0" RadiusY="10" RadiusX="10" x:Name="handler_logo_handler" Stroke="#FF1E1D1F">
                         <Rectangle.Effect>
-                            <DropShadowEffect BlurRadius="20" Direction="0" ShadowDepth="0" Opacity="0.8"/>
+                            <DropShadowEffect BlurRadius="20" Direction="0" ShadowDepth="0" Opacity="0.5"/>
                         </Rectangle.Effect>
                     </Rectangle>
-                    <Image Height="60" Width="60" HorizontalAlignment="Left" Margin="45,0,0,0" x:Name="handler_logo_image" Source="./logo.png"/>
+                    <Image Height="60" Width="60" HorizontalAlignment="Left" Margin="45,0,0,0" x:Name="handler_logo_image" Source="/logo.ico" />
                 </Grid>
 
                 <StackPanel x:Name="loadingbar" VerticalAlignment="Center" Margin="30,0,0,0">

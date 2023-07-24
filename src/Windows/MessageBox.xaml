@@ -1,0 +1,119 @@
+﻿<Window x:Class="prism.Windows.MessageBox"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:prism.Windows"
+        mc:Ignorable="d"
+        Title="MessageBox" ShowInTaskbar="False" Height="170" Width="350" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True" Background="{x:Null}" Icon="/logo.ico">
+
+    <Window.Resources>
+        <ControlTemplate x:Key="NoMouseOverButtonTemplate"   
+                 TargetType="Button">
+            <Border Background="{TemplateBinding Background}"  
+          BorderBrush="{TemplateBinding BorderBrush}"  
+          BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"  
+                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Border>
+
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled"  
+             Value="False">
+                    <Setter Property="Background"  
+              Value="{x:Static SystemColors.ControlLightBrush}" />
+                    <Setter Property="Foreground"  
+              Value="{x:Static SystemColors.GrayTextBrush}" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Rectangle x:Name="handler" RadiusX="20" RadiusY="20" Fill="#FF0C0C0C"/>
+
+        <Grid>
+            <Rectangle Height="30" RadiusX="10" RadiusY="10" VerticalAlignment="Top" Fill="#FF080808" Stroke="#FF151515" StrokeThickness="1" MouseDown="Rectangle_MouseDown">
+                <Rectangle.Effect>
+                    <DropShadowEffect Color="#FF151515" BlurRadius="60" Direction="0" ShadowDepth="0"/>
+                </Rectangle.Effect>
+            </Rectangle>
+
+            <Button RenderTransformOrigin="0.5,0.5" Template="{StaticResource NoMouseOverButtonTemplate}" FontFamily="Fonts/#Inter Bold" x:Name="okbutton" Click="okbutton_click" Cursor="Hand" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,20,15" Height="30" Width="70" Content="Alright" BorderBrush="#FF252525" BorderThickness="1" Foreground="#FFCECECE" Background="#FF101010">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="7.5"></Setter>
+                    </Style>
+                </Button.Resources>
+                <Button.Effect>
+                    <DropShadowEffect Direction="0" ShadowDepth="0" BlurRadius="30" Opacity="0.25"/>
+                </Button.Effect>
+
+                <Button.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform x:Name="okbutton_scaletransform"/>
+                        <SkewTransform/>
+                        <RotateTransform/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Button.RenderTransform>
+
+                <Button.Triggers>
+                    <EventTrigger RoutedEvent="Button.MouseEnter">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <Storyboard x:Name="okbutton_in_scalex">
+                                    <DoubleAnimation From="1" To="1.1" Duration="00:00:0.50"
+                                    Storyboard.TargetName="okbutton_scaletransform" 
+                                    Storyboard.TargetProperty="ScaleX">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"></CubicEase>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+
+                                <Storyboard x:Name="okbutton_in_scaley">
+                                    <DoubleAnimation From="1" To="1.1" Duration="00:00:0.50"
+                                    Storyboard.TargetName="okbutton_scaletransform" 
+                                    Storyboard.TargetProperty="ScaleY">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"></CubicEase>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+
+                    <EventTrigger RoutedEvent="Button.MouseLeave">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <Storyboard x:Name="okbutton_out_scalex">
+                                    <DoubleAnimation From="1.1" To="1" Duration="00:00:0.50"
+                                    Storyboard.TargetName="okbutton_scaletransform" 
+                                    Storyboard.TargetProperty="ScaleX">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"></CubicEase>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+
+                                <Storyboard x:Name="okbutton_out_scaley">
+                                    <DoubleAnimation From="1.1" To="1" Duration="00:00:0.50"
+                                    Storyboard.TargetName="okbutton_scaletransform" 
+                                    Storyboard.TargetProperty="ScaleY">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"></CubicEase>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+
+        <TextBlock FontFamily="Fonts/#Inter Bold" x:Name="messagelabel" Text="Null text." Height="70" Width="300" TextWrapping="Wrap" Foreground="#BFFFFFFF"/>
+    </Grid>
+</Window>

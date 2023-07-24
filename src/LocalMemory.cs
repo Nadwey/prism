@@ -6,5 +6,6 @@ namespace prism
     {
         public static int ClientHeight, ClientWidth, ClientX, ClientY;
         public static Process GameClient;
+        public static string GameClient_DefaultTitle;
     }
 }
