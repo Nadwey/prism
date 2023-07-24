@@ -18,3 +18,10 @@ By accepting this disclaimer, you agree to use this software for personal purpos
 
 If you do not agree with the terms of this disclaimer, please refrain from installing or using this software. <br>
 Sincerely, lemonek.
+
+<hr>
+
+Fully Maintained by [lemonek](https://github.com/lemonekq) (GFX, BRANDING, CODE, DESIGN).
+Built Using [WPF](https://github.com/dotnet/wpf), [.NET Framework](https://dotnet.microsoft.com/en-us/)
+[See MIT License (Prism, WPF)](https://github.com/lemonekq/prism/blob/main/LICENSE).
+<br><br>
